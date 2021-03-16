@@ -1,11 +1,20 @@
-
+/**
+ * A class representing a lottery ball.
+ */
 public class Ball {
+
+
+    //The value of the ball.
     private int number;
 
     // True if Display should wait
     // False if Selector should wait
     private boolean transfer = true;
 
+    /**
+     * Lets the other modules (threads) that the ball is ready to be displayed.
+     * @param number The value to be set for the ball transmitted.
+     */
     public synchronized void display(int number) {
         while (!transfer) {
             try {
@@ -20,6 +29,10 @@ public class Ball {
         notifyAll();
     }
 
+    /**
+     * Lets the other modules (threads) that the ball is ready to be drawn.
+     * @return The number of the ball drawn.
+     */
     public synchronized int draw() {
         while (transfer) {
             try {
