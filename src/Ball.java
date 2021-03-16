@@ -6,7 +6,7 @@ public class Ball {
     // False if Selector should wait
     private boolean transfer = true;
 
-    public synchronized void send(int number) {
+    public synchronized void display(int number) {
         while (!transfer) {
             try {
                 wait();

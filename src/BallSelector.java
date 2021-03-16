@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -6,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
 //TODO: print here also?
 public class BallSelector implements Runnable {
     private static final int BALL_NUM_UPPER_BOUND = 49;
-    private Ball ball;
+    private final Ball ball;
     private static final int BALLS_PER_LOTTERY = 7;
     private static final int END_OF_BALLS = -1;
     private static final int MAX_WAIT_TIME = 3000;
@@ -17,27 +18,33 @@ public class BallSelector implements Runnable {
     }
 
     public void run() {
-        ArrayList<Integer> numbers = new ArrayList<>();
-        while (numbers.size() < BALLS_PER_LOTTERY) {
-            int newNum = ThreadLocalRandom.current().nextInt(BALL_NUM_UPPER_BOUND)+1;
-            if (!numbers.contains(newNum)) {
-                numbers.add(newNum);
+        HashSet<Integer> numbers = new HashSet<>();
+        for (int i = 0; i < BALLS_PER_LOTTERY; i++) {
+            int number = ThreadLocalRandom.current().nextInt(BALL_NUM_UPPER_BOUND) + 1;;
+            while (numbers.contains(number)){
+                number = ThreadLocalRandom.current().nextInt(BALL_NUM_UPPER_BOUND) + 1;
             }
+            numbers.add(number);
+            ball.display(number);
+            waitForDisplay();
         }
-        numbers.add(END_OF_BALLS);
-        for (int number : numbers) {
-            ball.send(number);
-            try {
-                int waitTime = ThreadLocalRandom.current().nextInt(MAX_WAIT_TIME + 1 - MIN_WAIT_TIME) + MIN_WAIT_TIME;
-                Thread.sleep(waitTime);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                e.printStackTrace();
-            }
-        }
+        ball.display(END_OF_BALLS);
+        waitForDisplay();
     }
 
     public static int getEndToken() {
         return END_OF_BALLS;
+    }
+
+    private void waitForDisplay(){
+        try {
+            int waitTime = ThreadLocalRandom
+                    .current()
+                    .nextInt(MAX_WAIT_TIME + 1 - MIN_WAIT_TIME) + MIN_WAIT_TIME;
+            Thread.sleep(waitTime);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
     }
 }
